@@ -21,7 +21,7 @@ export function StatsModal({ open, stats, onClose }: StatsModalProps) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-cyan-200">Stats</p>
-            <h2 className="mt-2 text-3xl font-semibold text-white">Your Chronle record</h2>
+            <h2 className="mt-2 text-3xl font-semibold text-white">Your Yearsy record</h2>
           </div>
           <button
             type="button"

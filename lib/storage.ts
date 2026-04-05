@@ -1,8 +1,8 @@
 import { categories, type Category, type DailyProgress, type GameMode, type GameResult, type PlayerStats } from "@/lib/types";
 
-const STATS_KEY = "chronle-stats";
-const DAILY_PROGRESS_KEY = "chronle-daily-progress";
-const RECENT_UNLIMITED_KEY = "chronle-recent-unlimited";
+const STATS_KEY = "yearsy-stats";
+const DAILY_PROGRESS_KEY = "yearsy-daily-progress";
+const RECENT_UNLIMITED_KEY = "yearsy-recent-unlimited";
 
 function storageAvailable() {
   try {

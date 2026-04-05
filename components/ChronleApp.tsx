@@ -284,7 +284,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
       <header className="rounded-[32px] border border-white/10 bg-[rgba(10,20,32,0.9)] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.3)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.32em] text-cyan-200">Chronle</p>
+            <p className="text-sm uppercase tracking-[0.32em] text-cyan-200">Yearsy</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
               Guess history by the year.
             </h1>
@@ -438,7 +438,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
               <div className="mt-6">
                 {session.guesses.length === 0 ? (
                   <div className="rounded-[28px] border border-dashed border-white/10 bg-white/5 p-8 text-center text-slate-400">
-                    Start with your best guess. Chronle will tell you whether to go earlier or later.
+                    Start with your best guess. Yearsy will tell you whether to go earlier or later.
                   </div>
                 ) : (
                   <GuessHistory guesses={session.guesses} />
@@ -470,7 +470,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
                   Tap into one event, then read the timeline feedback.
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                  Chronle is built to be easy in under ten seconds: enter a year, follow the hint, and close the gap.
+                  Yearsy is built to be easy in under ten seconds: enter a year, follow the hint, and close the gap.
                 </p>
               </div>
 
@@ -478,7 +478,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
                 {[
                   ["Later", "Your guess was too early."],
                   ["Earlier", "Your guess was too late."],
-                  ["Closeness", "Chronle tells you whether the guess is very close, close, or not close."]
+                  ["Closeness", "Yearsy tells you whether the guess is very close, close, or not close."]
                 ].map(([title, text]) => (
                   <div key={title} className="rounded-[24px] border border-white/10 bg-slate-950/40 p-5">
                     <h3 className="text-xl font-semibold text-white">{title}</h3>

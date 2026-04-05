@@ -24,7 +24,7 @@ function getUtcDayIndex(dateKey: string) {
 export function getDailyPuzzle(dateKey: string): HistoricalEvent {
   const pool = getDailyPool();
   const orderedPool = [...pool].sort((left, right) => {
-    return hashString(`chronle-sequence-${left.id}`) - hashString(`chronle-sequence-${right.id}`);
+    return hashString(`yearsy-sequence-${left.id}`) - hashString(`yearsy-sequence-${right.id}`);
   });
   const dailyIndex = getUtcDayIndex(dateKey) % orderedPool.length;
   return orderedPool[dailyIndex];

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Chronle",
+  title: "Yearsy",
   description: "Guess the year of a historical event in six tries."
 };
 

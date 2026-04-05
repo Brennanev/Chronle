@@ -1,6 +1,6 @@
-# Chronle
+# Yearsy
 
-Chronle is a daily historical guessing game inspired by games like Wordle. Each round shows a historical event, and the player has 6 guesses to identify the correct year. After each guess, Chronle gives directional and distance feedback so the player can zero in on the answer.
+Yearsy is a daily historical guessing game inspired by games like Wordle. Each round shows a historical event, and the player has 6 guesses to identify the correct year. After each guess, Yearsy gives directional and closeness feedback so the player can zero in on the answer.
 
 ## Stack
 
@@ -63,7 +63,7 @@ lib/
 
 ## Daily Puzzle Selection
 
-Chronle uses a deterministic UTC-based daily system:
+Yearsy uses a deterministic UTC-based daily system:
 
 1. Build a daily-eligible pool from the event dataset
 2. Sort that pool into a stable order using a hash of each event id
@@ -98,7 +98,7 @@ Add more events in [data/events.ts](C:\Users\Brennan\OneDrive\Documentos\New%20p
 ["event-id", "Event title", "Short prompt description.", 1989, "Easy"]
 ```
 
-Chronle automatically builds the event explanation text and includes new events in unlimited play. Daily mode will also pick them up if they are not marked `Hard`.
+Yearsy automatically builds the event explanation text and includes new events in unlimited play. Daily mode will also pick them up if they are not marked `Hard`.
 
 ## Key Logic Modules
 
@@ -115,7 +115,7 @@ Chronle automatically builds the event explanation text and includes new events 
 
 ## Deploying
 
-Chronle is structured to deploy cleanly on Vercel:
+Yearsy is structured to deploy cleanly on Vercel:
 
 1. Push the project to a Git repository
 2. Import it into Vercel

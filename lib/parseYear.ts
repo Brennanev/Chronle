@@ -48,7 +48,7 @@ export function parseYear(input: string) {
   }
 
   if (year === 0) {
-    return { valid: false, error: "Year 0 is not supported in Chronle." } as const;
+    return { valid: false, error: "Year 0 is not supported in Yearsy." } as const;
   }
 
   if (year < -4000 || year > 2500) {
