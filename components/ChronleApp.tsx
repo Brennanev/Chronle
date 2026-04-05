@@ -64,8 +64,9 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
 
   useEffect(() => {
     setStats(loadStats());
-    setDailyProgress(loadDailyProgress(dailyDate));
-  }, [dailyDate]);
+    const savedProgress = loadDailyProgress(dailyDate);
+    setDailyProgress(savedProgress && savedProgress.eventId === dailyEvent.id ? savedProgress : null);
+  }, [dailyDate, dailyEvent.id]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -89,7 +90,10 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
       });
   }, []);
 
-  const dailyCompleted = dailyProgress?.date === dailyDate && dailyProgress.completed;
+  const dailyCompleted =
+    dailyProgress?.date === dailyDate &&
+    dailyProgress.eventId === dailyEvent.id &&
+    dailyProgress.completed;
   const todaysPoolCount = useMemo(() => getEventPool(filters).length, [filters]);
 
   function persistStats(nextStats: typeof stats) {
@@ -138,6 +142,14 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
     }
 
     beginSession("daily", dailyEvent, { category: "Mixed", difficulty: "Any" });
+  }
+
+  function appendEraSuffix(suffix: " BC" | " AD") {
+    setInputValue((current) => {
+      const trimmed = current.trim();
+      const withoutEra = trimmed.replace(/\s+(BC|BCE|AD|CE)$/i, "");
+      return withoutEra ? `${withoutEra}${suffix}` : current;
+    });
   }
 
   function startUnlimitedGame() {
@@ -430,6 +442,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
                   value={inputValue}
                   onChange={setInputValue}
                   onSubmit={submitGuess}
+                  onQuickFill={appendEraSuffix}
                   error={inputError}
                   disabled={session.completed}
                 />

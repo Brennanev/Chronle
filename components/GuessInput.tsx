@@ -4,11 +4,12 @@ type GuessInputProps = {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  onQuickFill?: (suffix: " BC" | " AD") => void;
   disabled?: boolean;
   error?: string;
 };
 
-export function GuessInput({ value, onChange, onSubmit, disabled, error }: GuessInputProps) {
+export function GuessInput({ value, onChange, onSubmit, onQuickFill, disabled, error }: GuessInputProps) {
   return (
     <div className="rounded-[28px] border border-white/10 bg-white/5 p-4 shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
       <label className="mb-2 block text-sm font-semibold text-slate-200" htmlFor="guess-year">
@@ -39,6 +40,24 @@ export function GuessInput({ value, onChange, onSubmit, disabled, error }: Guess
           onClick={onSubmit}
         >
           Lock Guess
+        </button>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={disabled}
+          className="rounded-full border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 disabled:cursor-not-allowed disabled:text-slate-500"
+          onClick={() => onQuickFill?.(" BC")}
+        >
+          Add BC
+        </button>
+        <button
+          type="button"
+          disabled={disabled}
+          className="rounded-full border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 disabled:cursor-not-allowed disabled:text-slate-500"
+          onClick={() => onQuickFill?.(" AD")}
+        >
+          Add AD
         </button>
       </div>
       <p className="mt-3 min-h-5 text-sm text-rose-300">{error ?? ""}</p>
