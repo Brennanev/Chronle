@@ -1,5 +1,5 @@
 import { allEvents } from "@/data/events";
-import type { Closeness, GuessFeedback, HistoricalEvent, PuzzleFilters, Temperature } from "@/lib/types";
+import type { Category, Closeness, GuessFeedback, HistoricalEvent, PuzzleFilters, Temperature } from "@/lib/types";
 import { formatYear } from "@/lib/parseYear";
 
 export const maxGuesses = 6;
