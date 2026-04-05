@@ -4,7 +4,7 @@ import type { HistoricalEvent } from "@/lib/types";
 const customDailyPuzzles: Record<string, HistoricalEvent> = {
   "2026-04-05": {
     id: "yearsy-custom-2026-04-05",
-    title: "The year your favorite son was born.",
+    title: "The year the sexiest man alive was born.",
     description: "A special daily challenge with a personal answer.",
     year: 2000,
     category: "U.S. History",
