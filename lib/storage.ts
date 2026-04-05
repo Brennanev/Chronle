@@ -1,4 +1,4 @@
-import { categories, type Category, type DailyProgress, type GameMode, type PlayerStats } from "@/lib/types";
+import { categories, type Category, type DailyProgress, type GameMode, type GameResult, type PlayerStats } from "@/lib/types";
 
 const STATS_KEY = "chronle-stats";
 const DAILY_PROGRESS_KEY = "chronle-daily-progress";
@@ -138,8 +138,9 @@ export function updateStatsFromGame(
       : Number((((stats.averageGuesses * stats.wins) + (params.won ? params.guessesUsed : 0)) / next.wins).toFixed(2));
 
   if (params.mode === "daily" && params.date) {
+    const result: GameResult = params.won ? "win" : "loss";
     next.dailyHistory = [
-      { date: params.date, eventId: params.eventId, result: params.won ? "win" : "loss", guesses: params.guessesUsed },
+      { date: params.date, eventId: params.eventId, result, guesses: params.guessesUsed },
       ...next.dailyHistory.filter((entry) => entry.date !== params.date)
     ].slice(0, 90);
   }
