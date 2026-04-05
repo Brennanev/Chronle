@@ -7,8 +7,8 @@ import { GuessInput } from "@/components/GuessInput";
 import { HowToPlayModal } from "@/components/HowToPlayModal";
 import { ResultModal } from "@/components/ResultModal";
 import { StatsModal } from "@/components/StatsModal";
-import { getCustomDailyPuzzle, getDailyPuzzle, getNextUtcMidnightCountdown } from "@/lib/daily";
-import { evaluateGuess, getEventPool, getUnlimitedPuzzle, getUtcDateKey, maxGuesses } from "@/lib/game";
+import { getCustomDailyPuzzle, getDailyPuzzle, getNextCentralMidnightCountdown } from "@/lib/daily";
+import { evaluateGuess, getEventPool, getUnlimitedPuzzle, getDailyDateKey, maxGuesses } from "@/lib/game";
 import { parseYear } from "@/lib/parseYear";
 import { buildShareText } from "@/lib/share";
 import {
@@ -59,7 +59,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
   const [resultOpen, setResultOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [countdownText, setCountdownText] = useState(formatCountdown(getNextUtcMidnightCountdown()));
+  const [countdownText, setCountdownText] = useState(formatCountdown(getNextCentralMidnightCountdown(new Date(), getDailyDateKey)));
   const [shareMessage, setShareMessage] = useState("");
 
   useEffect(() => {
@@ -70,14 +70,14 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setCountdownText(formatCountdown(getNextUtcMidnightCountdown()));
+      setCountdownText(formatCountdown(getNextCentralMidnightCountdown(new Date(), getDailyDateKey)));
     }, 1000);
 
     return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    const browserDateKey = getUtcDateKey();
+    const browserDateKey = getDailyDateKey();
     const browserOverride = getCustomDailyPuzzle(browserDateKey);
 
     if (browserOverride) {
@@ -93,7 +93,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
         setDailyEvent(eventById(payload.eventId));
       })
       .catch(() => {
-        const fallbackDate = getUtcDateKey();
+        const fallbackDate = getDailyDateKey();
         setDailyDate(fallbackDate);
         setDailyEvent(getDailyPuzzle(fallbackDate));
       });

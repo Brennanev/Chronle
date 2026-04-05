@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDailyPuzzle } from "@/lib/daily";
-import { getUtcDateKey } from "@/lib/game";
+import { getDailyDateKey } from "@/lib/game";
 
 export const dynamic = "force-dynamic";
 
 export function GET() {
-  const dateKey = getUtcDateKey();
+  const dateKey = getDailyDateKey();
   const puzzle = getDailyPuzzle(dateKey);
 
   return NextResponse.json(

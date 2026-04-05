@@ -3,9 +3,17 @@ import type { Category, Closeness, GuessFeedback, HistoricalEvent, PuzzleFilters
 import { formatYear } from "@/lib/parseYear";
 
 export const maxGuesses = 6;
+export const dailyResetTimeZone = "America/Chicago";
 
-export function getUtcDateKey(date = new Date()) {
-  return date.toISOString().slice(0, 10);
+export function getDailyDateKey(date = new Date()) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: dailyResetTimeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+
+  return formatter.format(date);
 }
 
 export function acceptedRangeForEvent(event: HistoricalEvent) {
