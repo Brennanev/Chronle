@@ -1,6 +1,18 @@
 import { allEvents } from "@/data/events";
 import type { HistoricalEvent } from "@/lib/types";
 
+const customDailyPuzzles: Record<string, HistoricalEvent> = {
+  "2026-04-05": {
+    id: "yearsy-custom-2026-04-05",
+    title: "The year your favorite son was born.",
+    description: "A special daily challenge with a personal answer.",
+    year: 2000,
+    category: "U.S. History",
+    difficulty: "Easy",
+    explanation: "Brennan Van Wey was born November 12, 2000."
+  }
+};
+
 function hashString(value: string) {
   let hash = 2166136261;
 
@@ -22,6 +34,12 @@ function getUtcDayIndex(dateKey: string) {
 }
 
 export function getDailyPuzzle(dateKey: string): HistoricalEvent {
+  const override = customDailyPuzzles[dateKey];
+
+  if (override) {
+    return override;
+  }
+
   const pool = getDailyPool();
   const orderedPool = [...pool].sort((left, right) => {
     return hashString(`yearsy-sequence-${left.id}`) - hashString(`yearsy-sequence-${right.id}`);
