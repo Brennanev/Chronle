@@ -22,6 +22,10 @@ const customDailyPuzzles: Record<string, HistoricalEvent> = {
   }
 };
 
+export function getCustomDailyPuzzle(dateKey: string) {
+  return customDailyPuzzles[dateKey] ?? null;
+}
+
 function hashString(value: string) {
   let hash = 2166136261;
 
@@ -43,7 +47,7 @@ function getUtcDayIndex(dateKey: string) {
 }
 
 export function getDailyPuzzle(dateKey: string): HistoricalEvent {
-  const override = customDailyPuzzles[dateKey];
+  const override = getCustomDailyPuzzle(dateKey);
 
   if (override) {
     return override;

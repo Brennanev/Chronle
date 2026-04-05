@@ -7,7 +7,7 @@ import { GuessInput } from "@/components/GuessInput";
 import { HowToPlayModal } from "@/components/HowToPlayModal";
 import { ResultModal } from "@/components/ResultModal";
 import { StatsModal } from "@/components/StatsModal";
-import { getDailyPuzzle, getNextUtcMidnightCountdown } from "@/lib/daily";
+import { getCustomDailyPuzzle, getDailyPuzzle, getNextUtcMidnightCountdown } from "@/lib/daily";
 import { evaluateGuess, getEventPool, getUnlimitedPuzzle, getUtcDateKey, maxGuesses } from "@/lib/game";
 import { parseYear } from "@/lib/parseYear";
 import { buildShareText } from "@/lib/share";
@@ -77,6 +77,15 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
   }, []);
 
   useEffect(() => {
+    const browserDateKey = getUtcDateKey();
+    const browserOverride = getCustomDailyPuzzle(browserDateKey);
+
+    if (browserOverride) {
+      setDailyDate(browserDateKey);
+      setDailyEvent(browserOverride);
+      return;
+    }
+
     fetch("/api/daily")
       .then((response) => response.json())
       .then((payload: { date: string; eventId: string }) => {
