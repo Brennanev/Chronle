@@ -10,6 +10,15 @@ const customDailyPuzzles: Record<string, HistoricalEvent> = {
     category: "U.S. History",
     difficulty: "Easy",
     explanation: "Brennan Van Wey was born November 12, 2000."
+  },
+  "2026-04-06": {
+    id: "yearsy-custom-2026-04-05",
+    title: "The year your favorite son was born.",
+    description: "A special daily challenge with a personal answer.",
+    year: 2000,
+    category: "U.S. History",
+    difficulty: "Easy",
+    explanation: "Brennan Van Wey was born November 12, 2000."
   }
 };
 
