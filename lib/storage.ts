@@ -126,7 +126,7 @@ export function saveRecentTriviaIds(ids: string[]) {
     return;
   }
 
-  window.localStorage.setItem(RECENT_TRIVIA_KEY, JSON.stringify(ids.slice(-10)));
+  window.localStorage.setItem(RECENT_TRIVIA_KEY, JSON.stringify(ids.slice(-20)));
 }
 
 export function updateStatsFromGame(
