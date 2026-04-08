@@ -15,6 +15,11 @@ export function formatGuessForShare(guess: GuessFeedback) {
 }
 
 export function buildShareText(session: GameSession) {
+  if (session.kind === "trivia") {
+    const resultLine = session.result === "win" ? "Correct" : "Missed";
+    return ["Yearsy Trivia", resultLine].join("\n");
+  }
+
   const title =
     session.mode === "daily" && session.dailyDate
       ? `Yearsy Daily ${session.dailyDate}`

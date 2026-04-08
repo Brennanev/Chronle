@@ -30,6 +30,10 @@ export function ResultModal({
   const won = session.result === "win";
   const stars = won ? getStarRating(session.guesses.length) : 0;
   const starText = `${"★".repeat(stars)}${"☆".repeat(5 - stars)}`;
+  const answerLabel = session.kind === "trivia" ? "Correct answer" : "Correct year";
+  const answerValue = session.kind === "trivia" ? session.question.answer : formatYear(session.event.year);
+  const explanation = session.kind === "trivia" ? session.question.explanation : session.event.explanation;
+  const replayLabel = session.kind === "trivia" ? "Play Trivia" : "Play Unlimited";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
@@ -53,15 +57,15 @@ export function ResultModal({
         </div>
 
         <div className="mt-6 rounded-[28px] border border-white/10 bg-white/5 p-5">
-          <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Correct year</p>
-          <p className="mt-2 text-4xl font-semibold text-cyan-200">{formatYear(session.event.year)}</p>
+          <p className="text-sm uppercase tracking-[0.24em] text-slate-400">{answerLabel}</p>
+          <p className="mt-2 text-4xl font-semibold text-cyan-200">{answerValue}</p>
           <div className="mt-4">
             <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Star score</p>
             <p className="mt-2 text-3xl tracking-[0.18em] text-amber-300" aria-label={`${stars} out of 5 stars`}>
               {starText}
             </p>
           </div>
-          <p className="mt-4 text-base leading-7 text-slate-200">{session.event.explanation}</p>
+          <p className="mt-4 text-base leading-7 text-slate-200">{explanation}</p>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-3">
@@ -77,7 +81,7 @@ export function ResultModal({
             className="rounded-full border border-white/10 px-5 py-3 font-semibold text-slate-100"
             onClick={onPlayUnlimited}
           >
-            Play Unlimited
+            {replayLabel}
           </button>
         </div>
 

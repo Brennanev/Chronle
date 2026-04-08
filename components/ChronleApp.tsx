@@ -7,21 +7,25 @@ import { GuessInput } from "@/components/GuessInput";
 import { HowToPlayModal } from "@/components/HowToPlayModal";
 import { ResultModal } from "@/components/ResultModal";
 import { StatsModal } from "@/components/StatsModal";
+import { TriviaChoices } from "@/components/TriviaChoices";
 import { getCustomDailyPuzzle, getDailyPuzzle, getNextCentralMidnightCountdown } from "@/lib/daily";
 import { evaluateGuess, getEventPool, getUnlimitedPuzzle, getDailyDateKey, maxGuesses } from "@/lib/game";
 import { parseYear } from "@/lib/parseYear";
 import { buildShareText } from "@/lib/share";
+import { getTriviaQuestion } from "@/lib/trivia";
 import {
   defaultStats,
   loadDailyProgress,
+  loadRecentTriviaIds,
   loadRecentUnlimitedIds,
   loadStats,
   saveDailyProgress,
+  saveRecentTriviaIds,
   saveRecentUnlimitedIds,
   saveStats,
   updateStatsFromGame
 } from "@/lib/storage";
-import type { Category, DailyProgress, Difficulty, GameSession, HistoricalEvent, PuzzleFilters } from "@/lib/types";
+import type { Category, DailyProgress, Difficulty, GameSession, HistoricalEvent, PuzzleFilters, TriviaGameSession } from "@/lib/types";
 
 const initialFilters: PuzzleFilters = {
   category: "Mixed",
@@ -110,13 +114,14 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
     saveStats(nextStats);
   }
 
-  function beginSession(mode: "daily" | "unlimited", event: HistoricalEvent, activeFilters: PuzzleFilters) {
+  function beginYearSession(mode: "daily" | "unlimited", event: HistoricalEvent, activeFilters: PuzzleFilters) {
     setInputValue("");
     setInputError("");
     setShareMessage("");
     setResultOpen(false);
 
     setSession({
+      kind: "year",
       mode,
       dailyDate: mode === "daily" ? dailyDate : undefined,
       event,
@@ -125,6 +130,28 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
       completed: false,
       startedAt: Date.now()
     });
+  }
+
+  function beginTriviaSession() {
+    const recentIds = loadRecentTriviaIds();
+    const question = getTriviaQuestion(recentIds);
+    saveRecentTriviaIds([...recentIds, question.id]);
+    setInputValue("");
+    setInputError("");
+    setShareMessage("");
+    setResultOpen(false);
+
+    const triviaSession: TriviaGameSession = {
+      kind: "trivia",
+      mode: "trivia",
+      question,
+      filters: { category: question.category, difficulty: "Any" },
+      guesses: [],
+      completed: false,
+      startedAt: Date.now()
+    };
+
+    setSession(triviaSession);
   }
 
   function startDailyGame() {
@@ -139,6 +166,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
       setInputError("");
       setShareMessage("");
       setSession({
+        kind: "year",
         mode: "daily",
         dailyDate,
         event: dailyEvent,
@@ -150,7 +178,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
       return;
     }
 
-    beginSession("daily", dailyEvent, { category: "Mixed", difficulty: "Any" });
+    beginYearSession("daily", dailyEvent, { category: "Mixed", difficulty: "Any" });
   }
 
   function appendEraSuffix(suffix: " BC" | " AD") {
@@ -165,7 +193,11 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
     const recentIds = loadRecentUnlimitedIds();
     const event = getUnlimitedPuzzle(filters, recentIds);
     saveRecentUnlimitedIds([...recentIds, event.id]);
-    beginSession("unlimited", event, filters);
+    beginYearSession("unlimited", event, filters);
+  }
+
+  function startTriviaGame() {
+    beginTriviaSession();
   }
 
   function finishSession(nextSession: GameSession) {
@@ -174,16 +206,16 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
 
     const nextStats = updateStatsFromGame(stats, {
       mode: nextSession.mode,
-      category: nextSession.filters.category,
+      category: nextSession.kind === "trivia" ? nextSession.question.category : nextSession.filters.category,
       won: nextSession.result === "win",
       guessesUsed: nextSession.guesses.length,
-      date: nextSession.dailyDate,
-      eventId: nextSession.event.id
+      date: nextSession.kind === "year" ? nextSession.dailyDate : undefined,
+      eventId: nextSession.kind === "trivia" ? nextSession.question.id : nextSession.event.id
     });
 
     persistStats(nextStats);
 
-    if (nextSession.mode === "daily" && nextSession.dailyDate) {
+    if (nextSession.kind === "year" && nextSession.mode === "daily" && nextSession.dailyDate) {
       const progress: DailyProgress = {
         date: nextSession.dailyDate,
         eventId: nextSession.event.id,
@@ -199,7 +231,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
   }
 
   function submitGuess() {
-    if (!session || session.completed) {
+    if (!session || session.kind !== "year" || session.completed) {
       return;
     }
 
@@ -251,12 +283,30 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
     }
   }
 
+  function submitTriviaAnswer(answer: string) {
+    if (!session || session.kind !== "trivia" || session.completed) {
+      return;
+    }
+
+    const isCorrect = answer === session.question.answer;
+    const nextSession: TriviaGameSession = {
+      ...session,
+      guesses: [{ selectedAnswer: answer, isCorrect }],
+      completed: true,
+      result: isCorrect ? "win" : "loss",
+      finishedAt: Date.now()
+    };
+
+    finishSession(nextSession);
+  }
+
   async function handleShare() {
     const shareSession =
       session && session.completed
         ? session
         : dailyCompleted && dailyProgress
           ? {
+              kind: "year" as const,
               mode: "daily" as const,
               dailyDate,
               event: dailyEvent,
@@ -288,6 +338,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
       ? session
       : dailyCompleted && dailyProgress
         ? {
+            kind: "year" as const,
             mode: "daily" as const,
             dailyDate,
             event: dailyEvent,
@@ -411,6 +462,27 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
               </button>
             </div>
           </div>
+
+          <div className="rounded-[32px] border border-white/10 bg-white/5 p-5">
+            <p className="text-sm uppercase tracking-[0.24em] text-cyan-200">Trivia Mode</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">General multiple choice</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-300">
+              Switch out of dates for a quick four-option trivia round. One question, one pick, instant result.
+            </p>
+            <div className="mt-4 rounded-[24px] border border-white/10 bg-slate-950/40 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Format</p>
+              <p className="mt-2 text-lg font-semibold text-white">4 answer choices</p>
+            </div>
+            <div className="mt-4 flex gap-3">
+              <button
+                type="button"
+                className="flex-1 rounded-full bg-emerald-300 px-5 py-3 font-semibold text-slate-950"
+                onClick={startTriviaGame}
+              >
+                Start Trivia
+              </button>
+            </div>
+          </div>
         </aside>
 
         <section className="rounded-[32px] border border-white/10 bg-[rgba(10,20,32,0.82)] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.3)]">
@@ -419,51 +491,91 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
               <div className="rounded-[28px] border border-white/10 bg-white/5 p-5">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-sm font-semibold text-cyan-200">
-                    {session.mode === "daily" ? "Daily" : "Unlimited"}
+                    {session.kind === "trivia" ? "Trivia" : session.mode === "daily" ? "Daily" : "Unlimited"}
                   </span>
                   <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-semibold text-slate-200">
-                    {session.event.category}
+                    {session.kind === "trivia" ? session.question.category : session.event.category}
                   </span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-semibold text-slate-200">
-                    {session.event.difficulty}
-                  </span>
+                  {session.kind === "year" ? (
+                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-semibold text-slate-200">
+                      {session.event.difficulty}
+                    </span>
+                  ) : null}
                 </div>
-                <h2 className="mt-4 text-3xl font-semibold text-white">{session.event.title}</h2>
-                <p className="mt-3 text-base leading-7 text-slate-300">{session.event.description}</p>
+                <h2 className="mt-4 text-3xl font-semibold text-white">
+                  {session.kind === "trivia" ? session.question.prompt : session.event.title}
+                </h2>
+                <p className="mt-3 text-base leading-7 text-slate-300">
+                  {session.kind === "trivia"
+                    ? "Choose one of the four answers below."
+                    : session.event.description}
+                </p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Guesses left</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{maxGuesses - session.guesses.length}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                      {session.kind === "trivia" ? "Question type" : "Guesses left"}
+                    </p>
+                    <p className="mt-2 text-2xl font-semibold text-white">
+                      {session.kind === "trivia" ? "Multiple choice" : maxGuesses - session.guesses.length}
+                    </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
                     <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Current streak</p>
                     <p className="mt-2 text-2xl font-semibold text-white">{stats.currentStreak}</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Daily reset</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{countdownText}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                      {session.kind === "trivia" ? "Round format" : "Daily reset"}
+                    </p>
+                    <p className="mt-2 text-2xl font-semibold text-white">
+                      {session.kind === "trivia" ? "1 question" : countdownText}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6">
-                <GuessInput
-                  value={inputValue}
-                  onChange={setInputValue}
-                  onSubmit={submitGuess}
-                  onQuickFill={appendEraSuffix}
-                  error={inputError}
-                  disabled={session.completed}
-                />
+                {session.kind === "year" ? (
+                  <GuessInput
+                    value={inputValue}
+                    onChange={setInputValue}
+                    onSubmit={submitGuess}
+                    onQuickFill={appendEraSuffix}
+                    error={inputError}
+                    disabled={session.completed}
+                  />
+                ) : (
+                  <TriviaChoices
+                    choices={session.question.choices}
+                    selectedAnswer={session.guesses[0]?.selectedAnswer}
+                    correctAnswer={session.question.answer}
+                    completed={session.completed}
+                    onSelect={submitTriviaAnswer}
+                  />
+                )}
               </div>
 
               <div className="mt-6">
-                {session.guesses.length === 0 ? (
+                {session.kind === "year" ? (
+                  session.guesses.length === 0 ? (
+                    <div className="rounded-[28px] border border-dashed border-white/10 bg-white/5 p-8 text-center text-slate-400">
+                      Start with your best guess. Yearsy will tell you whether to go earlier or later.
+                    </div>
+                  ) : (
+                    <GuessHistory guesses={session.guesses} />
+                  )
+                ) : session.guesses.length === 0 ? (
                   <div className="rounded-[28px] border border-dashed border-white/10 bg-white/5 p-8 text-center text-slate-400">
-                    Start with your best guess. Yearsy will tell you whether to go earlier or later.
+                    Pick the answer you think is right. Trivia mode resolves after one choice.
                   </div>
                 ) : (
-                  <GuessHistory guesses={session.guesses} />
+                  <div className="rounded-[28px] border border-white/10 bg-white/5 p-5">
+                    <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Your answer</p>
+                    <p className="mt-2 text-xl font-semibold text-white">{session.guesses[0].selectedAnswer}</p>
+                    <p className="mt-3 text-sm text-slate-300">
+                      {session.guesses[0].isCorrect ? "Correct choice." : "Not quite. Open the result for the full explanation."}
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -478,9 +590,9 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
                 <button
                   type="button"
                   className="rounded-full border border-white/10 px-5 py-3 font-semibold text-slate-100"
-                  onClick={startUnlimitedGame}
+                  onClick={session.kind === "trivia" ? startTriviaGame : startUnlimitedGame}
                 >
-                  New Unlimited
+                  {session.kind === "trivia" ? "New Trivia" : "New Unlimited"}
                 </button>
               </div>
             </div>
@@ -489,10 +601,10 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
               <div>
                 <p className="text-sm uppercase tracking-[0.24em] text-cyan-200">Ready</p>
                 <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
-                  Tap into one event, then read the timeline feedback.
+                  Pick a mode, then jump into either timeline guessing or fast trivia.
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                  Yearsy is built to be easy in under ten seconds: enter a year, follow the hint, and close the gap.
+                  Yearsy now has two ways to play: the core year-guessing game and a quick multiple-choice trivia mode.
                 </p>
               </div>
 
@@ -500,7 +612,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
                 {[
                   ["Later", "Your guess was too early."],
                   ["Earlier", "Your guess was too late."],
-                  ["Closeness", "Yearsy tells you whether the guess is very close, close, or not close."]
+                  ["Trivia", "Or switch to a four-choice question when you want a faster, broader trivia round."]
                 ].map(([title, text]) => (
                   <div key={title} className="rounded-[24px] border border-white/10 bg-slate-950/40 p-5">
                     <h3 className="text-xl font-semibold text-white">{title}</h3>
@@ -515,7 +627,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
                 <p className="mt-3 text-sm leading-7 text-slate-300">
                   {dailyCompleted
                     ? "You already wrapped today's daily. Open the summary or jump into unlimited mode."
-                    : "Today's event is waiting. Everyone gets the same puzzle on the same UTC day."}
+                    : "Today's event is waiting. Everyone gets the same puzzle on the same day."}
                 </p>
               </div>
             </div>
@@ -532,7 +644,11 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
         onShare={handleShare}
         onPlayUnlimited={() => {
           setResultOpen(false);
-          startUnlimitedGame();
+          if (displayResultSession?.kind === "trivia") {
+            startTriviaGame();
+          } else {
+            startUnlimitedGame();
+          }
         }}
       />
       <StatsModal open={statsOpen} stats={stats} onClose={() => setStatsOpen(false)} />

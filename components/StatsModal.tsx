@@ -39,9 +39,10 @@ export function StatsModal({ open, stats, onClose }: StatsModalProps) {
             ["Win rate", `${winRate}%`],
             ["Current streak", stats.currentStreak],
             ["Best streak", stats.bestStreak],
-            ["Avg guesses", stats.averageGuesses || "—"],
+            ["Avg guesses", stats.averageGuesses || "-"],
             ["Daily wins", stats.dailyWins],
             ["Unlimited wins", stats.unlimitedWins],
+            ["Trivia wins", stats.triviaWins],
             ["Daily entries", stats.dailyHistory.length]
           ].map(([label, value]) => (
             <div key={label} className="rounded-[24px] border border-white/10 bg-white/5 p-4">

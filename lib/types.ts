@@ -20,7 +20,7 @@ export const difficulties = ["Easy", "Medium", "Hard"] as const;
 export type Category = (typeof categories)[number];
 export type EventCategory = (typeof eventCategories)[number];
 export type Difficulty = (typeof difficulties)[number];
-export type GameMode = "daily" | "unlimited";
+export type GameMode = "daily" | "unlimited" | "trivia";
 export type Closeness = "Exact" | "Very close" | "Close" | "Not close";
 export type Direction = "earlier" | "later" | "exact";
 export type Temperature = "warmer" | "colder" | "same";
@@ -61,7 +61,22 @@ export type GuessFeedback = {
 
 export type GameResult = "win" | "loss";
 
-export type GameSession = {
+export type TriviaQuestion = {
+  id: string;
+  prompt: string;
+  choices: [string, string, string, string];
+  answer: string;
+  explanation: string;
+  category: Category;
+};
+
+export type TriviaGuess = {
+  selectedAnswer: string;
+  isCorrect: boolean;
+};
+
+export type YearGameSession = {
+  kind: "year";
   mode: GameMode;
   dailyDate?: string;
   event: HistoricalEvent;
@@ -72,6 +87,20 @@ export type GameSession = {
   startedAt: number;
   finishedAt?: number;
 };
+
+export type TriviaGameSession = {
+  kind: "trivia";
+  mode: "trivia";
+  question: TriviaQuestion;
+  filters: PuzzleFilters;
+  guesses: TriviaGuess[];
+  completed: boolean;
+  result?: GameResult;
+  startedAt: number;
+  finishedAt?: number;
+};
+
+export type GameSession = YearGameSession | TriviaGameSession;
 
 export type DailyProgress = {
   date: string;
@@ -92,6 +121,7 @@ export type PlayerStats = {
   averageGuesses: number;
   dailyWins: number;
   unlimitedWins: number;
+  triviaWins: number;
   categoryBreakdown: Record<Category, { played: number; wins: number }>;
   dailyHistory: Array<{
     date: string;

@@ -3,6 +3,7 @@ import { categories, type Category, type DailyProgress, type GameMode, type Game
 const STATS_KEY = "yearsy-stats";
 const DAILY_PROGRESS_KEY = "yearsy-daily-progress";
 const RECENT_UNLIMITED_KEY = "yearsy-recent-unlimited";
+const RECENT_TRIVIA_KEY = "yearsy-recent-trivia";
 
 function storageAvailable() {
   try {
@@ -28,6 +29,7 @@ export function defaultStats(): PlayerStats {
     averageGuesses: 0,
     dailyWins: 0,
     unlimitedWins: 0,
+    triviaWins: 0,
     categoryBreakdown: defaultCategoryBreakdown(),
     dailyHistory: []
   };
@@ -103,6 +105,27 @@ export function saveRecentUnlimitedIds(ids: string[]) {
   window.localStorage.setItem(RECENT_UNLIMITED_KEY, JSON.stringify(ids.slice(-10)));
 }
 
+export function loadRecentTriviaIds() {
+  if (!storageAvailable()) {
+    return [] as string[];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(RECENT_TRIVIA_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveRecentTriviaIds(ids: string[]) {
+  if (!storageAvailable()) {
+    return;
+  }
+
+  window.localStorage.setItem(RECENT_TRIVIA_KEY, JSON.stringify(ids.slice(-10)));
+}
+
 export function updateStatsFromGame(
   stats: PlayerStats,
   params: {
@@ -125,8 +148,10 @@ export function updateStatsFromGame(
     next.categoryBreakdown[params.category].wins += 1;
     if (params.mode === "daily") {
       next.dailyWins += 1;
-    } else {
+    } else if (params.mode === "unlimited") {
       next.unlimitedWins += 1;
+    } else {
+      next.triviaWins += 1;
     }
   } else {
     next.currentStreak = 0;
