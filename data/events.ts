@@ -7,7 +7,7 @@ function yearLabel(year: number) {
 }
 
 function buildExplanation(event: EventInput) {
-  return `${event.title} happened in ${yearLabel(event.year)}. ${event.description}`;
+  return `${event.title} in ${yearLabel(event.year)}. ${event.description}`;
 }
 
 function createEvent(event: EventInput): HistoricalEvent {
