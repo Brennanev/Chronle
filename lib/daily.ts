@@ -2,14 +2,14 @@ import { allEvents } from "@/data/events";
 import type { HistoricalEvent } from "@/lib/types";
 
 const customDailyPuzzles: Record<string, HistoricalEvent> = {
-  "2026-04-05": {
-    id: "yearsy-custom-2026-04-05",
-    title: "The year the sexiest man alive was born.",
-    description: "A special daily challenge with a personal answer.",
-    year: 2000,
-    category: "U.S. History",
+  "2026-04-07": {
+    id: "yearsy-custom-2026-04-07",
+    title: "Rick Astley's \"Never Gonna Give You Up\" was released in this year.",
+    description: "A special daily challenge about a famous pop song release.",
+    year: 1987,
+    category: "Pop Culture",
     difficulty: "Easy",
-    explanation: "Brennan Van Wey was born November 12, 2000."
+    explanation: "\"Never Gonna Give You Up\" was released in 1987."
   }
 };
 
