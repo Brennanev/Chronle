@@ -152,10 +152,8 @@ export function updateStatsFromGame(
     next.categoryBreakdown[params.category].wins += 1;
     if (params.mode === "daily") {
       next.dailyWins += 1;
-      next.triviaCurrentStreak = 0;
     } else if (params.mode === "unlimited") {
       next.unlimitedWins += 1;
-      next.triviaCurrentStreak = 0;
     } else {
       next.triviaWins += 1;
       next.triviaCurrentStreak += 1;
