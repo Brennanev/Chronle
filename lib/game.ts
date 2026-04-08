@@ -141,5 +141,5 @@ export function getStarRating(guessesUsed: number) {
     return 0;
   }
 
-  return Math.max(0, Math.min(5, maxGuesses - guessesUsed));
+  return Math.max(1, Math.min(5, maxGuesses - guessesUsed + 1));
 }
