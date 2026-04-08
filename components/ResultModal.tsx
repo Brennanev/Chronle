@@ -1,5 +1,6 @@
 "use client";
 
+import { getStarRating } from "@/lib/game";
 import { formatYear } from "@/lib/parseYear";
 import type { GameSession } from "@/lib/types";
 
@@ -27,6 +28,8 @@ export function ResultModal({
   }
 
   const won = session.result === "win";
+  const stars = won ? getStarRating(session.guesses.length) : 0;
+  const starText = `${"★".repeat(stars)}${"☆".repeat(5 - stars)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
@@ -52,6 +55,12 @@ export function ResultModal({
         <div className="mt-6 rounded-[28px] border border-white/10 bg-white/5 p-5">
           <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Correct year</p>
           <p className="mt-2 text-4xl font-semibold text-cyan-200">{formatYear(session.event.year)}</p>
+          <div className="mt-4">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Star score</p>
+            <p className="mt-2 text-3xl tracking-[0.18em] text-amber-300" aria-label={`${stars} out of 5 stars`}>
+              {starText}
+            </p>
+          </div>
           <p className="mt-4 text-base leading-7 text-slate-200">{session.event.explanation}</p>
         </div>
 

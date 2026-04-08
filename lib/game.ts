@@ -135,3 +135,11 @@ export function difficultyLabel(event: HistoricalEvent) {
 export function categoryBadge(category: Category) {
   return category === "Mixed" ? "Mixed timeline" : category;
 }
+
+export function getStarRating(guessesUsed: number) {
+  if (!Number.isFinite(guessesUsed) || guessesUsed <= 0) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(5, maxGuesses - guessesUsed));
+}
