@@ -350,10 +350,11 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
             finishedAt: dailyProgress.finishedAt
           }
         : null;
+  const showingHome = !session;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8">
-      <header className="rounded-[32px] border border-white/10 bg-[rgba(10,20,32,0.9)] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.3)]">
+    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <header className="rounded-[32px] border border-white/10 bg-[rgba(10,20,32,0.9)] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.3)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.32em] text-cyan-200">Yearsy</p>
@@ -383,12 +384,12 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
         </div>
       </header>
 
-      <section className="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
-        <aside className="space-y-6">
-          <div className="rounded-[32px] border border-white/10 bg-white/5 p-5">
+      <section className={showingHome ? "grid gap-4" : "grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]"}>
+        <aside className={showingHome ? "grid gap-4 lg:grid-cols-3" : "space-y-6"}>
+          <div className="rounded-[32px] border border-white/10 bg-white/5 p-4">
             <p className="text-sm uppercase tracking-[0.24em] text-cyan-200">Daily Puzzle</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">Same puzzle for everyone</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
+            <h2 className="mt-3 text-xl font-semibold text-white">Same puzzle for everyone</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
               Complete today's event once, keep the streak alive, then jump into unlimited play.
             </p>
             <div className="mt-4 rounded-[24px] border border-white/10 bg-slate-950/40 p-4">
@@ -409,9 +410,9 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
             </div>
           </div>
 
-          <div className="rounded-[32px] border border-white/10 bg-white/5 p-5">
+          <div className="rounded-[32px] border border-white/10 bg-white/5 p-4">
             <p className="text-sm uppercase tracking-[0.24em] text-cyan-200">Unlimited Mode</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">Build your own run</h2>
+            <h2 className="mt-3 text-xl font-semibold text-white">Build your own run</h2>
             <div className="mt-4 space-y-4">
               <label className="block text-sm text-slate-300">
                 Category
@@ -463,10 +464,10 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
             </div>
           </div>
 
-          <div className="rounded-[32px] border border-white/10 bg-white/5 p-5">
+          <div className="rounded-[32px] border border-white/10 bg-white/5 p-4">
             <p className="text-sm uppercase tracking-[0.24em] text-cyan-200">Trivia Mode</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">General multiple choice</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
+            <h2 className="mt-3 text-xl font-semibold text-white">General multiple choice</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
               Switch out of dates for a quick four-option trivia round. One question, one pick, instant result.
             </p>
             <div className="mt-4 rounded-[24px] border border-white/10 bg-slate-950/40 p-4">
@@ -485,7 +486,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
           </div>
         </aside>
 
-        <section className="rounded-[32px] border border-white/10 bg-[rgba(10,20,32,0.82)] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.3)]">
+        <section className={`rounded-[32px] border border-white/10 bg-[rgba(10,20,32,0.82)] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.3)] ${showingHome ? "" : ""}`}>
           {session ? (
             <div>
               <div className="rounded-[28px] border border-white/10 bg-white/5 p-5">
@@ -597,7 +598,7 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
               </div>
             </div>
           ) : (
-            <div className="flex min-h-[560px] flex-col justify-between rounded-[28px] border border-white/10 bg-white/5 p-5">
+            <div className="flex min-h-[380px] flex-col justify-between rounded-[28px] border border-white/10 bg-white/5 p-5">
               <div>
                 <p className="text-sm uppercase tracking-[0.24em] text-cyan-200">Ready</p>
                 <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
