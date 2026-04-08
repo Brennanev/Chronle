@@ -9,7 +9,7 @@ import { ResultModal } from "@/components/ResultModal";
 import { StatsModal } from "@/components/StatsModal";
 import { TriviaChoices } from "@/components/TriviaChoices";
 import { getCustomDailyPuzzle, getDailyPuzzle, getNextCentralMidnightCountdown } from "@/lib/daily";
-import { evaluateGuess, getEventPool, getUnlimitedPuzzle, getDailyDateKey, maxGuesses } from "@/lib/game";
+import { evaluateGuess, getEventPool, getUnlimitedPuzzle, getDailyDateKey, getStarRating, maxGuesses } from "@/lib/game";
 import { parseYear } from "@/lib/parseYear";
 import { buildShareText } from "@/lib/share";
 import { getTriviaQuestion } from "@/lib/trivia";
@@ -209,6 +209,10 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
       category: nextSession.kind === "trivia" ? nextSession.question.category : nextSession.filters.category,
       won: nextSession.result === "win",
       guessesUsed: nextSession.guesses.length,
+      starsEarned:
+        nextSession.kind === "year" && nextSession.result === "win"
+          ? getStarRating(nextSession.guesses.length)
+          : 0,
       date: nextSession.kind === "year" ? nextSession.dailyDate : undefined,
       eventId: nextSession.kind === "trivia" ? nextSession.question.id : nextSession.event.id
     });
@@ -521,8 +525,12 @@ export function ChronleApp({ initialDailyDate, initialDailyId }: ChronleAppProps
                     </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Current streak</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{stats.currentStreak}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                      {session.kind === "trivia" ? "Trivia streak" : "Current streak"}
+                    </p>
+                    <p className="mt-2 text-2xl font-semibold text-white">
+                      {session.kind === "trivia" ? stats.triviaCurrentStreak : stats.currentStreak}
+                    </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
                     <p className="text-xs uppercase tracking-[0.24em] text-slate-400">

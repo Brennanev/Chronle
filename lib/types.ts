@@ -118,7 +118,10 @@ export type PlayerStats = {
   wins: number;
   currentStreak: number;
   bestStreak: number;
+  triviaCurrentStreak: number;
+  triviaBestStreak: number;
   averageGuesses: number;
+  averageStars: number;
   dailyWins: number;
   unlimitedWins: number;
   triviaWins: number;

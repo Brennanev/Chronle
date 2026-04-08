@@ -26,7 +26,10 @@ export function defaultStats(): PlayerStats {
     wins: 0,
     currentStreak: 0,
     bestStreak: 0,
+    triviaCurrentStreak: 0,
+    triviaBestStreak: 0,
     averageGuesses: 0,
+    averageStars: 0,
     dailyWins: 0,
     unlimitedWins: 0,
     triviaWins: 0,
@@ -133,6 +136,7 @@ export function updateStatsFromGame(
     category: Category;
     won: boolean;
     guessesUsed: number;
+    starsEarned?: number;
     date?: string;
     eventId: string;
   }
@@ -148,19 +152,39 @@ export function updateStatsFromGame(
     next.categoryBreakdown[params.category].wins += 1;
     if (params.mode === "daily") {
       next.dailyWins += 1;
+      next.triviaCurrentStreak = 0;
     } else if (params.mode === "unlimited") {
       next.unlimitedWins += 1;
+      next.triviaCurrentStreak = 0;
     } else {
       next.triviaWins += 1;
+      next.triviaCurrentStreak += 1;
+      next.triviaBestStreak = Math.max(next.triviaBestStreak, next.triviaCurrentStreak);
     }
   } else {
     next.currentStreak = 0;
+    if (params.mode === "trivia") {
+      next.triviaCurrentStreak = 0;
+    }
   }
 
   next.averageGuesses =
     next.wins === 0
       ? 0
       : Number((((stats.averageGuesses * stats.wins) + (params.won ? params.guessesUsed : 0)) / next.wins).toFixed(2));
+
+  const yearModeWin = params.won && (params.mode === "daily" || params.mode === "unlimited");
+  const yearWinsBefore = stats.dailyWins + stats.unlimitedWins;
+  const yearWinsAfter = yearWinsBefore + (yearModeWin ? 1 : 0);
+  next.averageStars =
+    yearWinsAfter === 0
+      ? 0
+      : Number(
+          (
+            ((stats.averageStars || 0) * yearWinsBefore + (yearModeWin ? (params.starsEarned ?? 0) : 0)) /
+            yearWinsAfter
+          ).toFixed(2)
+        );
 
   if (params.mode === "daily" && params.date) {
     const result: GameResult = params.won ? "win" : "loss";
